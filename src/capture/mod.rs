@@ -193,8 +193,17 @@ pub fn capture_region_with<B: CaptureBackend>(
 pub fn capture_window_with<B: CaptureBackend>(
     backend: &B,
 ) -> Result<CaptureArtifact, CaptureError> {
+    let monitor_json = backend.focused_monitors_json()?;
+    let focused_monitor = parse_focused_monitor(&monitor_json)?;
+    let focused_workspace_id =
+        focused_monitor
+            .active_workspace_id
+            .ok_or(CaptureError::InvalidMonitorMetadata {
+                message: "focused monitor missing active workspace id".to_string(),
+            })?;
+
     let clients_json = backend.clients_json()?;
-    let window_candidates = parse_selectable_windows(&clients_json)?;
+    let window_candidates = parse_selectable_windows(&clients_json, focused_workspace_id)?;
     if window_candidates.is_empty() {
         return Err(CaptureError::InvalidSelection {
             message: "window selection has no selectable windows".to_string(),
@@ -253,6 +262,8 @@ struct MonitorStatus {
     y: Option<i32>,
     width: Option<i32>,
     height: Option<i32>,
+    #[serde(default, rename = "activeWorkspace")]
+    active_workspace: Option<WorkspaceStatus>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -262,6 +273,7 @@ struct FocusedMonitor {
     y: i32,
     width: Option<u32>,
     height: Option<u32>,
+    active_workspace_id: Option<i32>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -286,6 +298,14 @@ struct WindowClientStatus {
     at: Option<[i32; 2]>,
     #[serde(default)]
     size: Option<[i32; 2]>,
+    #[serde(default)]
+    workspace: Option<WorkspaceStatus>,
+}
+
+#[derive(Deserialize)]
+struct WorkspaceStatus {
+    #[serde(default)]
+    id: Option<i32>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -324,6 +344,10 @@ fn parse_focused_monitor(monitors_json: &str) -> Result<FocusedMonitor, CaptureE
         y: monitor.y.unwrap_or(0),
         width: normalize_monitor_dimension(monitor.width),
         height: normalize_monitor_dimension(monitor.height),
+        active_workspace_id: monitor
+            .active_workspace
+            .and_then(|workspace| workspace.id)
+            .filter(|id| *id != 0),
     })
 }
 
@@ -392,6 +416,7 @@ fn parse_region_selection(geometry: &str) -> Result<CaptureSelection, CaptureErr
 
 fn parse_selectable_windows(
     clients_json: &str,
+    focused_workspace_id: i32,
 ) -> Result<Vec<WindowSelectionCandidate>, CaptureError> {
     let clients: Vec<WindowClientStatus> =
         serde_json::from_str(clients_json).map_err(|err| CaptureError::InvalidWindowMetadata {
@@ -401,6 +426,11 @@ fn parse_selectable_windows(
     let mut candidates = Vec::new();
     for client in clients {
         if client.hidden.unwrap_or(false) || matches!(client.mapped, Some(false)) {
+            continue;
+        }
+        if client.workspace.as_ref().and_then(|workspace| workspace.id)
+            != Some(focused_workspace_id)
+        {
             continue;
         }
 
@@ -632,6 +662,9 @@ mod tests {
         calls: RefCell<Vec<String>>,
     }
 
+    const FOCUSED_MONITOR_WITH_WORKSPACE_JSON: &str =
+        r#"[{"name":"DP-1","focused":true,"activeWorkspace":{"id":1,"name":"1"}}]"#;
+
     impl FakeCaptureBackend {
         fn new(monitors_json: &str, dimensions: (u32, u32), region_selection: &str) -> Self {
             Self {
@@ -725,7 +758,7 @@ mod tests {
 
     #[test]
     fn parse_focused_monitor_prefers_focused_monitor() {
-        let json = r#"[{"name":"DP-1","focused":false},{"name":"HDMI-A-1","focused":true,"x":100,"y":200,"width":2560,"height":1440}]"#;
+        let json = r#"[{"name":"DP-1","focused":false},{"name":"HDMI-A-1","focused":true,"x":100,"y":200,"width":2560,"height":1440,"activeWorkspace":{"id":3,"name":"3"}}]"#;
         assert_eq!(
             parse_focused_monitor(json).expect("focused monitor should parse"),
             FocusedMonitor {
@@ -734,6 +767,7 @@ mod tests {
                 y: 200,
                 width: Some(2560),
                 height: Some(1440),
+                active_workspace_id: Some(3),
             }
         );
     }
@@ -817,8 +851,8 @@ mod tests {
     #[test]
     fn capture_window_uses_window_selection_and_creates_artifact() {
         let mut backend =
-            FakeCaptureBackend::new(r#"[{"name":"DP-1","focused":true}]"#, (800, 600), "");
-        backend.clients_json = r#"[{"title":"Browser","class":"firefox","mapped":true,"hidden":false,"at":[30,40],"size":[300,200]}]"#.to_string();
+            FakeCaptureBackend::new(FOCUSED_MONITOR_WITH_WORKSPACE_JSON, (800, 600), "");
+        backend.clients_json = r#"[{"title":"Browser","class":"firefox","mapped":true,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[30,40],"size":[300,200]}]"#.to_string();
         backend.window_selection = "30,40 300x200".to_string();
         let artifact = capture_window_with(&backend).expect("fake adapter should capture window");
 
@@ -831,11 +865,12 @@ mod tests {
         assert!(artifact.temp_path.exists());
 
         let calls = backend.calls();
-        assert_eq!(calls.len(), 3);
-        assert_eq!(calls[0], "hyprctl clients -j");
-        assert_eq!(calls[1], "slurp -r");
+        assert_eq!(calls.len(), 4);
+        assert_eq!(calls[0], "hyprctl monitors -j");
+        assert_eq!(calls[1], "hyprctl clients -j");
+        assert_eq!(calls[2], "slurp -r");
         assert_eq!(
-            calls[2],
+            calls[3],
             format!("grim -g 30,40 300x200 {}", artifact.temp_path.display())
         );
         assert_eq!(
@@ -849,42 +884,37 @@ mod tests {
     #[test]
     fn capture_window_errors_when_no_selectable_window_exists() {
         let mut backend =
-            FakeCaptureBackend::new(r#"[{"name":"DP-1","focused":true}]"#, (800, 600), "");
+            FakeCaptureBackend::new(FOCUSED_MONITOR_WITH_WORKSPACE_JSON, (800, 600), "");
         backend.clients_json =
-            r#"[{"title":"hidden","hidden":true,"at":[1,2],"size":[3,4]}]"#.to_string();
+            r#"[{"title":"hidden","hidden":true,"workspace":{"id":1,"name":"1"},"at":[1,2],"size":[3,4]}]"#.to_string();
 
         let err =
             capture_window_with(&backend).expect_err("missing selectable windows should error");
         assert!(matches!(err, CaptureError::InvalidSelection { message: _ }));
 
         let calls = backend.calls();
-        assert_eq!(calls.len(), 1);
-        assert_eq!(calls[0], "hyprctl clients -j");
+        assert_eq!(calls.len(), 2);
+        assert_eq!(calls[0], "hyprctl monitors -j");
+        assert_eq!(calls[1], "hyprctl clients -j");
     }
 
     #[test]
-    fn capture_window_does_not_require_focused_monitor_metadata() {
-        let mut backend = FakeCaptureBackend::new("not-json", (400, 300), "");
+    fn capture_window_errors_when_focused_workspace_metadata_is_missing() {
+        let mut backend =
+            FakeCaptureBackend::new(r#"[{"name":"DP-1","focused":true}]"#, (400, 300), "");
         backend.clients_json =
-            r#"[{"title":"Editor","mapped":true,"hidden":false,"at":[9,11],"size":[120,70]}]"#
+            r#"[{"title":"Editor","mapped":true,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[9,11],"size":[120,70]}]"#
                 .to_string();
         backend.window_selection = "9,11 120x70".to_string();
 
-        let artifact =
-            capture_window_with(&backend).expect("window capture should not read monitors");
-        assert_eq!(artifact.screen_x, 9);
-        assert_eq!(artifact.screen_y, 11);
+        let err = capture_window_with(&backend)
+            .expect_err("window capture should fail when focused workspace id is missing");
+        assert!(matches!(
+            err,
+            CaptureError::InvalidMonitorMetadata { message: _ }
+        ));
 
-        let calls = backend.calls();
-        assert_eq!(
-            calls,
-            vec![
-                "hyprctl clients -j".to_string(),
-                "slurp -r".to_string(),
-                format!("grim -g 9,11 120x70 {}", artifact.temp_path.display()),
-            ]
-        );
-        let _ = std::fs::remove_file(artifact.temp_path);
+        assert_eq!(backend.calls(), vec!["hyprctl monitors -j".to_string()]);
     }
 
     #[test]
@@ -939,10 +969,9 @@ mod tests {
     #[test]
     fn capture_window_cleans_up_temp_file_when_dimension_read_fails() {
         let mut backend =
-            FakeCaptureBackend::new(r#"[{"name":"DP-1","focused":true}]"#, (1920, 1080), "");
+            FakeCaptureBackend::new(FOCUSED_MONITOR_WITH_WORKSPACE_JSON, (1920, 1080), "");
         backend.clients_json =
-            r#"[{"title":"window","mapped":true,"hidden":false,"at":[10,20],"size":[80,60]}]"#
-                .to_string();
+            r#"[{"title":"window","mapped":true,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[10,20],"size":[80,60]}]"#.to_string();
         backend.window_selection = "10,20 80x60".to_string();
         backend.fail_image_dimensions = true;
 
@@ -998,17 +1027,18 @@ mod tests {
     }
 
     #[test]
-    fn parse_selectable_windows_filters_invalid_and_hidden_clients() {
+    fn parse_selectable_windows_filters_invalid_hidden_and_out_of_workspace_clients() {
         let clients_json = r#"
 [
-  {"title":"Browser","class":"firefox","mapped":true,"hidden":false,"at":[5,10],"size":[400,300]},
-  {"title":"Hidden","mapped":true,"hidden":true,"at":[0,0],"size":[10,10]},
-  {"title":"Unmapped","mapped":false,"hidden":false,"at":[0,0],"size":[10,10]},
-  {"title":"InvalidSize","mapped":true,"hidden":false,"at":[0,0],"size":[0,10]},
+  {"title":"Browser","class":"firefox","mapped":true,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[5,10],"size":[400,300]},
+  {"title":"OtherWorkspace","mapped":true,"hidden":false,"workspace":{"id":2,"name":"2"},"at":[8,9],"size":[50,60]},
+  {"title":"Hidden","mapped":true,"hidden":true,"workspace":{"id":1,"name":"1"},"at":[0,0],"size":[10,10]},
+  {"title":"Unmapped","mapped":false,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[0,0],"size":[10,10]},
+  {"title":"InvalidSize","mapped":true,"hidden":false,"workspace":{"id":1,"name":"1"},"at":[0,0],"size":[0,10]},
   {"title":"MissingGeometry","mapped":true,"hidden":false}
 ]
 "#;
-        let candidates = parse_selectable_windows(clients_json).expect("clients should parse");
+        let candidates = parse_selectable_windows(clients_json, 1).expect("clients should parse");
         assert_eq!(
             candidates,
             vec![WindowSelectionCandidate {
