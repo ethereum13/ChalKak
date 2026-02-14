@@ -263,7 +263,57 @@ Notes:
 - Do not set shortcut arrays to empty lists.
 - Key names are normalized, so common modifier aliases (`ctrl`, `control`, `cmd`, `super`) are accepted.
 
-## 10. Where Files Go
+## 10. Wire Chalkak to Hyprland Keybindings
+
+For fast capture workflows on Omarchy/Hyprland, bind Chalkak commands directly in Hyprland.
+
+### 10.1 Check the binary path first
+
+```bash
+which chalkak
+```
+
+- AUR install is usually `/usr/bin/chalkak`
+- Older `cargo install` setups may still use `~/.cargo/bin/chalkak`
+
+Your Hyprland binding must point to the currently valid path.
+
+### 10.2 Add bindings in `bindings.conf`
+
+Add this to `~/.config/hypr/bindings.conf`:
+
+```conf
+# Chalkak screenshot bindings (Option = ALT)
+unbind = ALT SHIFT, 2
+unbind = ALT SHIFT, 3
+unbind = ALT SHIFT, 4
+bindd = ALT SHIFT, 2, Chalkak region capture, exec, /usr/bin/chalkak --capture-region
+bindd = ALT SHIFT, 3, Chalkak window capture, exec, /usr/bin/chalkak --capture-window
+bindd = ALT SHIFT, 4, Chalkak full capture, exec, /usr/bin/chalkak --capture-full
+```
+
+Notes:
+
+- `unbind` helps avoid conflicts with existing bindings.
+- Replace `/usr/bin/chalkak` if your executable path is different.
+
+### 10.3 Reload and verify
+
+```bash
+hyprctl reload
+hyprctl binds -j | jq -r '.[] | select(.description|test("Chalkak")) | [.description,.arg] | @tsv'
+```
+
+If you see `Chalkak ... capture` entries with the expected path, bindings are active.
+
+### 10.4 Omarchy-specific note
+
+Omarchy loads multiple files via `source = ...` in `hyprland.conf`. Ensure `~/.config/hypr/bindings.conf` is included.
+
+- If you manage Hypr files via symlinked dotfiles, edit the link target.
+- If keybindings stopped working after moving from Cargo to AUR, check for stale `~/.cargo/bin/chalkak` paths.
+
+## 11. Where Files Go
 
 Temporary captures:
 
@@ -276,7 +326,7 @@ Saved screenshots:
 
 Chalkak creates these directories when needed.
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 ### Symptom: capture does not start
 
@@ -325,7 +375,7 @@ What to do:
 1. Set `XDG_RUNTIME_DIR` in your login environment.
 2. Remove stale `capture_*.png` files from `$XDG_RUNTIME_DIR` (or `/tmp/chalkak` if fallback is active).
 
-## 12. Practical Workflow Presets
+## 13. Practical Workflow Presets
 
 ### Fast one-shot screenshot
 
@@ -347,7 +397,7 @@ What to do:
 3. Blur sensitive sections with `b`.
 4. Copy with `Ctrl+C`.
 
-## 13. Quick Command Cheat Sheet
+## 14. Quick Command Cheat Sheet
 
 ```bash
 # launch UI first

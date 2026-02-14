@@ -263,7 +263,59 @@ cargo run -- --launchpad
 - 단축키 배열을 빈 리스트(`[]`)로 두면 오류가 발생함
 - 수정자 키 별칭(`ctrl`, `control`, `cmd`, `super`)은 정규화되어 인식됨
 
-## 10. 파일 저장 위치
+## 10. Hyprland 키바인딩으로 Chalkak 연결하기
+
+Omarchy/Hyprland에서 자주 쓰는 캡처를 즉시 실행하려면 Hyprland 바인딩에 Chalkak 명령을 직접 연결하세요.
+
+### 10.1 실행 파일 경로 확인
+
+먼저 현재 설치 기준 실행 경로를 확인합니다.
+
+```bash
+which chalkak
+```
+
+- AUR 설치라면 보통 `/usr/bin/chalkak`
+- 과거 `cargo install`을 썼다면 `~/.cargo/bin/chalkak`일 수 있음
+
+이 경로가 실제 바인딩에서 실행될 경로와 일치해야 합니다.
+
+### 10.2 `bindings.conf`에 바인딩 추가
+
+`~/.config/hypr/bindings.conf`에 아래처럼 추가합니다.
+
+```conf
+# Chalkak screenshot bindings (Option = ALT)
+unbind = ALT SHIFT, 2
+unbind = ALT SHIFT, 3
+unbind = ALT SHIFT, 4
+bindd = ALT SHIFT, 2, Chalkak region capture, exec, /usr/bin/chalkak --capture-region
+bindd = ALT SHIFT, 3, Chalkak window capture, exec, /usr/bin/chalkak --capture-window
+bindd = ALT SHIFT, 4, Chalkak full capture, exec, /usr/bin/chalkak --capture-full
+```
+
+메모:
+
+- 기존 바인딩과 충돌하면 `unbind`가 먼저 실행되어 덮어쓸 수 있습니다.
+- 본인 환경의 실제 경로에 맞게 `/usr/bin/chalkak` 부분을 바꿔야 합니다.
+
+### 10.3 설정 반영 및 점검
+
+```bash
+hyprctl reload
+hyprctl binds -j | jq -r '.[] | select(.description|test("Chalkak")) | [.description,.arg] | @tsv'
+```
+
+출력에 `Chalkak ... capture` 항목과 실행 경로가 보이면 반영된 상태입니다.
+
+### 10.4 Omarchy 사용자 참고
+
+Omarchy 설정은 `hyprland.conf`에서 여러 `source = ...` 파일을 로드합니다. `~/.config/hypr/bindings.conf`가 로드되는지 확인하세요.
+
+- Dotfiles를 심볼릭 링크로 관리 중이라면 실제 편집 대상이 링크 원본 경로일 수 있습니다.
+- `cargo` 설치에서 AUR 설치로 옮긴 뒤 단축키가 안 먹는 경우, 바인딩 경로가 `~/.cargo/bin/chalkak`로 남아있는지 먼저 확인하세요.
+
+## 11. 파일 저장 위치
 
 임시 캡처:
 
@@ -276,7 +328,7 @@ cargo run -- --launchpad
 
 필요 시 Chalkak이 디렉터리를 자동 생성합니다.
 
-## 11. 문제 해결
+## 12. 문제 해결
 
 ### 증상: 캡처가 시작되지 않음
 
@@ -325,7 +377,7 @@ cargo run -- --launchpad
 1. 로그인 환경에 `XDG_RUNTIME_DIR` 설정
 2. `$XDG_RUNTIME_DIR` (fallback 사용 시 `/tmp/chalkak`)의 오래된 `capture_*.png` 파일 정리
 
-## 12. 작업 목적별 추천 흐름
+## 13. 작업 목적별 추천 흐름
 
 ### 빠른 1회성 캡처
 
@@ -347,7 +399,7 @@ cargo run -- --launchpad
 3. `b`로 민감 영역 블러 처리
 4. `Ctrl+C` 복사
 
-## 13. 빠른 명령어 요약
+## 14. 빠른 명령어 요약
 
 ```bash
 # 런치패드부터 시작
