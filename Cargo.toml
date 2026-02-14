@@ -3,6 +3,8 @@ name = "chalkak"
 version = "0.1.0"
 edition = "2021"
 description = "Hyprland screenshot preview and editor utility"
+repository = "https://github.com/BitYoungjae/ChalKak"
+homepage = "https://github.com/BitYoungjae/ChalKak"
 license = "MIT OR Apache-2.0"
 authors = ["BitYoungjae <bityoungjae@gmail.com>"]
 
