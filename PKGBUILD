@@ -11,7 +11,7 @@ depends=('gtk4' 'hyprland' 'grim' 'slurp' 'wl-clipboard')
 makedepends=('rust' 'cargo' 'pkgconf' 'gtk4' 'cmake')
 optdepends=('chalkak-ocr-models: OCR text recognition support')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('5d9df4145a4f141549139f31c5620e4cbd951ec93224364cd9f46dbd85cb3a87')
+sha256sums=('6a84ec37f6ad02c0468d8168f700be683e206577c70eaafaf95e1904485d4689')
 
 build() {
   cd "$_srcname-$pkgver"
