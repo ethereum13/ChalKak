@@ -1,8 +1,0 @@
-{
-  "language": "en",
-  "commitPattern": "gitmoji",
-  "branchPattern": "type/description",
-  "splitCommits": true,
-  "askOnAmbiguity": true,
-  "createPrTemplate": true
-}
